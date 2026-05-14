@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSCameraUsageDescription</key>
+	<string>用來掃描黑膠唱片標籤，辨識藝人、專輯及目錄號資訊</string>
+	<key>CFBundleDisplayName</key>
+	<string>IdentifyVinyl</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>UILaunchScreen</key>
+	<dict/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array><string>arm64</string></array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array><string>UIInterfaceOrientationPortrait</string></array>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>api.discogs.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<false/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
