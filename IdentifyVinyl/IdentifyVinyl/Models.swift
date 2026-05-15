@@ -18,6 +18,8 @@ struct ScannedLabel {
     }
 }
 
+// MARK: - Discogs Search
+
 struct DiscogsSearchResponse: Codable {
     let results: [DiscogsRelease]
     let pagination: DiscogsPagination
@@ -28,6 +30,7 @@ struct DiscogsPagination: Codable {
     let items: Int
     let perPage: Int
     let page: Int
+
     enum CodingKeys: String, CodingKey {
         case pages, items, page
         case perPage = "per_page"
@@ -48,20 +51,25 @@ struct DiscogsRelease: Codable, Identifiable {
     let uri: String?
     let catno: String?
     let resourceUrl: String?
+
     enum CodingKeys: String, CodingKey {
         case id, title, year, label, format, country, thumb, genre, style, uri, catno
         case coverImage = "cover_image"
         case resourceUrl = "resource_url"
     }
+
     var artistName: String? {
         let parts = title.components(separatedBy: " - ")
         return parts.count >= 2 ? parts[0] : nil
     }
+
     var albumTitle: String? {
         let parts = title.components(separatedBy: " - ")
         return parts.count >= 2 ? parts.dropFirst().joined(separator: " - ") : parts[0]
     }
 }
+
+// MARK: - Release Detail
 
 struct ReleaseDetail: Codable, Identifiable {
     let id: Int
@@ -81,16 +89,21 @@ struct ReleaseDetail: Codable, Identifiable {
     let country: String?
     let uri: String?
     let released: String?
+    let community: DiscogsCommunity?
+
     enum CodingKeys: String, CodingKey {
         case id, title, artists, year, labels, formats, genres, styles
-        case tracklist, thumb, images, notes, country, uri, released
+        case tracklist, thumb, images, notes, country, uri, released, community
         case lowestPrice = "lowest_price"
         case numForSale = "num_for_sale"
     }
+
     var primaryImageURL: URL? {
-        let urlStr = images?.first(where: { $0.type == "primary" })?.uri ?? images?.first?.uri
+        let urlStr = images?.first(where: { $0.type == "primary" })?.uri
+            ?? images?.first?.uri
         return urlStr.flatMap { URL(string: $0) }
     }
+
     var artistDisplay: String {
         if let artists, !artists.isEmpty {
             return artists.map(\.name)
@@ -101,9 +114,23 @@ struct ReleaseDetail: Codable, Identifiable {
     }
 }
 
-struct DiscogsArtist: Codable { let id: Int?; let name: String; let anv: String? }
-struct DiscogsLabel: Codable { let id: Int?; let name: String; let catno: String? }
-struct DiscogsFormat: Codable { let name: String; let qty: String?; let descriptions: [String]? }
+struct DiscogsArtist: Codable {
+    let id: Int?
+    let name: String
+    let anv: String?
+}
+
+struct DiscogsLabel: Codable {
+    let id: Int?
+    let name: String
+    let catno: String?
+}
+
+struct DiscogsFormat: Codable {
+    let name: String
+    let qty: String?
+    let descriptions: [String]?
+}
 
 struct DiscogsTrack: Codable, Identifiable {
     var id: String { "\(position)-\(title)" }
@@ -111,10 +138,27 @@ struct DiscogsTrack: Codable, Identifiable {
     let title: String
     let duration: String?
     let extraArtists: [DiscogsArtist]?
+
     enum CodingKeys: String, CodingKey {
         case position, title, duration
         case extraArtists = "extraartists"
     }
 }
 
-struct DiscogsImage: Codable { let uri: String; let type: String?; let width: Int?; let height: Int? }
+struct DiscogsImage: Codable {
+    let uri: String
+    let type: String?
+    let width: Int?
+    let height: Int?
+}
+
+struct DiscogsCommunity: Codable {
+    let rating: DiscogsCommunityRating?
+    let have: Int?
+    let want: Int?
+}
+
+struct DiscogsCommunityRating: Codable {
+    let average: Double?
+    let count: Int?
+}
