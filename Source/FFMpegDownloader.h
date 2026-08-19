@@ -1,10 +1,10 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
-#import "Utils/MobileFFmpeg/MobileFFmpegConfig.h"
-#import "Utils/MobileFFmpeg/MobileFFmpeg.h"
-#import "Utils/MobileFFmpeg/MobileFFprobe.h"
-#import "Utils/MBProgressHUD/MBProgressHUD.h"
+#import "../Vendor/MobileFFmpeg/MobileFFmpegConfig.h"
+#import "../Vendor/MobileFFmpeg/MobileFFmpeg.h"
+#import "../Vendor/MobileFFmpeg/MobileFFprobe.h"
+#import "../Vendor/MBProgressHUD/MBProgressHUD.h"
 #import "Headers/Localization.h"
 
 @interface FFMpegDownloader : NSObject <LogDelegate, StatisticsDelegate>
