@@ -1,4 +1,4 @@
-#include "GSVolBar.h"
+#include "../../Vendor/GSVolBar/GSVolBar.h"
 
 static BOOL YTMU(NSString *key) {
     NSDictionary *YTMUltimateDict = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"YTMUltimate"];
