@@ -1,0 +1,93 @@
+# Home Guard 設定檔範例
+# 複製成 config.toml 後修改: cp config.example.toml config.toml && chmod 600 config.toml
+
+[general]
+data_dir = "/usr/local/var/home-guard"   # 原始 log、狀態資料庫、報告都放這裡
+retention_days = 30                       # 原始 log 與報告保留天數
+learning_days = 3                         # 前 N 天只學習「已知 IP / 已知裝置」,不發新 IP / 新裝置警報
+min_notify_severity = "warning"           # 達到此等級才發通知: info | warning | critical
+
+[receiver]
+listen = "0.0.0.0"
+udp_port = 514                            # 設 0 可關閉
+tcp_port = 514
+
+# 每台送 log 過來的設備。ip 可以是字串或陣列。
+# 沒登記的設備仍會收,存在 logs/unknown-<ip>/ 底下。
+[[devices]]
+name = "router"
+ip = "192.168.1.1"
+silent_minutes = 60                       # 超過 60 分鐘沒收到 log 就警告 (0 = 不檢查)
+
+[[devices]]
+name = "nas"
+ip = "192.168.1.10"
+
+[[devices]]
+name = "switch"
+ip = ["192.168.1.2"]
+silent_minutes = 0                        # 這台平常 log 很少,不檢查沉默
+
+[local_mac]
+enabled = true                            # 分析 Mac mini 本機的 unified log (log show)
+name = "mac-mini"
+max_lookback_minutes = 120
+check_panics = true                       # 新的 kernel panic 報告
+check_launch_items = true                 # 新增 LaunchAgents / LaunchDaemons (常見的惡意程式常駐手法)
+disk_usage_percent = 90                   # data_dir 所在磁碟使用率超過就警告 (0 = 不檢查)
+# predicate = '(process == "sshd") OR (process == "sudo")'   # 自訂 log show 過濾條件
+
+[detect]
+trusted_networks = ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "fd00::/8"]
+brute_force_threshold = 5                 # 同一來源 IP 在一次分析區間內登入失敗幾次算暴力破解
+silent_minutes = 120                      # 裝置沒有個別設定時的沉默門檻
+volume_sigma = 4.0                        # log 量超過「此時段平均 + N 個標準差」視為暴增
+volume_min_events = 50                    # 暴增至少要有幾筆才警告
+volume_min_samples = 24                   # 每個時段至少累積幾次樣本才開始判斷暴增
+alert_cooldown_minutes = 120              # 同一則警報多久內不重複通知
+
+[detect.known_macs]                       # 已知裝置,不會觸發「新裝置連上網路」
+# "aa:bb:cc:dd:ee:ff" = "我的 iPhone"
+
+# 自訂規則 (可新增,也可用相同 id 覆寫/停用內建規則)
+# [[rules]]
+# id = "vpn_login"
+# title = "VPN 連線"
+# pattern = '(?i)openvpn.*(peer connection initiated|authenticated)'
+# severity = "info"          # info | warning | critical
+# group_by = "ip"            # device | ip | mac | user
+# threshold = 1
+# devices = "^router$"       # 只套用到名稱符合的設備 (regex,可省略)
+#
+# [[rules]]
+# id = "firewall_flood"      # 覆寫內建規則的門檻
+# threshold = 300
+#
+# [[rules]]
+# id = "reboot"              # 停用內建規則
+# enabled = false
+
+[notify.email]
+enabled = false
+smtp_host = "smtp.gmail.com"
+smtp_port = 587
+starttls = true
+ssl = false                               # 用 465 port 時改 ssl = true
+username = "you@gmail.com"
+password = ""                             # Gmail 請用「應用程式密碼」;或留空改用環境變數
+password_env = "HOMEGUARD_SMTP_PASSWORD"
+from = "you@gmail.com"
+to = ["you@gmail.com"]
+
+[notify.telegram]
+enabled = false
+bot_token = ""                            # 從 @BotFather 取得;或留空改用環境變數
+bot_token_env = "HOMEGUARD_TELEGRAM_TOKEN"
+chat_id = ""                              # 你的 chat id (見 README)
+
+# 選用:有警報時請 Claude Code 用白話摘要 (會把警報與 log 樣本送到 Anthropic)
+[ai]
+enabled = false
+command = ["claude", "-p"]
+timeout_seconds = 180
+max_sample_lines = 60
